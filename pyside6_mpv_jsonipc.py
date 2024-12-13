@@ -16,12 +16,17 @@ class MPVWidget(QWidget):
 
     def init_mpv(self):
         """Start mpv process and embed it in the PySide6 application."""
-        print("start")
+
+        print("start MPV process")
+
         print(f"{self.winId()=}")
+        print(f"{str(int(self.winId()))=}")
+
         self.process = subprocess.Popen(
             [
                 "mpv",
                 "--no-border",
+                "--ontop",  # mpv window on top
                 "--osc=no",  # no on screen commands
                 "--input-ipc-server=" + self.socket_path,
                 "--wid=" + str(int(self.winId())),  # Embed in the widget
@@ -31,7 +36,7 @@ class MPVWidget(QWidget):
             stderr=subprocess.PIPE,
         )
 
-        print(self.process)
+        print(f"{self.process=}")
 
     def send_command(self, command):
         """Send a JSON command to the mpv IPC server."""
