@@ -1,3 +1,8 @@
+"""
+run mpv in json-ipc mode and display output in a pyside6 widget
+
+"""
+
 import sys
 import socket
 import json
@@ -46,16 +51,20 @@ class MPVWidget(QWidget):
                 # Connect to the MPV IPC server
                 client.connect(self.socket_path)
                 # Send the JSON command
-                # print(f"{json.dumps(command).encode('utf-8')=}")
                 client.sendall(json.dumps(command).encode("utf-8") + b"\n")
                 # Receive the response
                 response = client.recv(2000)
+                """
                 print()
                 print(f"{response=}")
+                """
                 # Parse the response as JSON
                 response_data = json.loads(response.decode("utf-8"))
+
+                """
                 print(f"{response_data=}")
-                # Return the 'data' field which contains the playback position
+                """
+
                 return response_data.get("data")
         except FileNotFoundError:
             print("Error: Socket file not found.")
@@ -64,7 +73,10 @@ class MPVWidget(QWidget):
         return None
 
     def load_file(self, file_path) -> None:
-        """Load a media file in mpv."""
+        """
+        Load a media file in mpv.
+        """
+
         self.send_command({"command": ["loadfile", file_path]})
         self.pause()
         self.send_command({"command": ["set_property", "time-pos", 0]})
@@ -123,10 +135,13 @@ class MainWindow(QMainWindow):
         """
         Load a video file in mpv.
         """
+        if len(sys.argv) == 1:
+            file_path, _ = QFileDialog.getOpenFileName(self, "Select a File")
+            if not file_path:
+                return
+        else:
+            file_path = sys.argv[1]
 
-        file_path, _ = QFileDialog.getOpenFileName(self, "Select a File")
-        if not file_path:
-            return
         self.mpv_widget.load_file(file_path)
         self.timer.start(200)
 
