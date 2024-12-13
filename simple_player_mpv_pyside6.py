@@ -1,5 +1,3 @@
-#! /usr/bin/python3
-
 """
 A simple Media Player using MPV and Pyside6
 
@@ -11,9 +9,20 @@ see https://mpv.io/manual/master/#command-interface
 import sys
 import time
 import mpv as mpv
-from PySide6.QtGui import *
-from PySide6.QtCore import *
-from PySide6.QtWidgets import *
+from PySide6.QtGui import QCursor, QAction
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtWidgets import (
+    QFrame,
+    QMainWindow,
+    QWidget,
+    QLabel,
+    QPushButton,
+    QSlider,
+    QHBoxLayout,
+    QVBoxLayout,
+    QFileDialog,
+    QApplication,
+)
 
 
 class Video_frame(QFrame):
@@ -223,10 +232,13 @@ class Player(QMainWindow):
         see https://mpv.io/manual/master/#command-interface-screenshot-raw
 
         """
+
+        """
         image_qt = ImageQt(self.player.screenshot_raw())
         pixmap = QPixmap.fromImage(image_qt)
 
         self.frame_label.setPixmap(pixmap.scaled(self.frame_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        """
 
     """
     def mousePressEvent(self, event):
@@ -273,7 +285,10 @@ class Player(QMainWindow):
         """
 
         if not self.player.filename:
-            self.OpenFile()
+            if len(sys.argv) == 1:
+                self.OpenFile()
+            else:
+                self.OpenFile(sys.argv[1])
 
         self.player.pause = not self.player.pause
 
@@ -322,8 +337,6 @@ class Player(QMainWindow):
         Open a media file in a MediaPlayer
         """
 
-        # filename = "video1.mp4"
-
         if not filename:
             filename, _ = QFileDialog.getOpenFileName(self, "Open File", "")
         if not filename:
@@ -360,7 +373,7 @@ class Player(QMainWindow):
         print("resize", event)
         try:
             self.overlay.remove()
-        except:
+        except Exception:
             pass
 
 
